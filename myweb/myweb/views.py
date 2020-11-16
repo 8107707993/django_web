@@ -1,5 +1,4 @@
-
-# I have created this file - Harry
+# I have created this file - Harry video #17
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -20,14 +19,15 @@ def ex1(request):
 
 def analyze(request):
     #Get the text
-    djtext = request.GET.get('text', 'default')
-    print(djtext)
+    djtext = request.POST.get('text', 'default')
+
 
     # Check checkbox values
-    removepunc = request.GET.get('removepunc', 'off')
-    fullcaps = request.GET.get('fullcaps', 'off')
-    newlineremover = request.GET.get('newlineremover', 'off')
-    extraspaceremover = request.GET.get('extraspaceremover', 'off')
+    removepunc = request.POST.get('removepunc', 'off')
+    fullcaps = request.POST.get('fullcaps', 'off')
+    newlineremover = request.POST.get('newlineremover', 'off')
+    extraspaceremover = request.POST.get('extraspaceremover', 'off')
+
 
     #Check which checkbox is on
     if removepunc == "on":
@@ -38,52 +38,44 @@ def analyze(request):
                 analyzed = analyzed + char
 
         params = {'purpose':'Removed Punctuations', 'analyzed_text': analyzed}
-        return render(request, 'analyze.html', params)
+        djtext = analyzed
+        # return render(request, 'analyze.html', params)
 
-    elif(fullcaps=="on"):
+    if(fullcaps=="on"):
         analyzed = ""
         for char in djtext:
             analyzed = analyzed + char.upper()
 
         params = {'purpose': 'Changed to Uppercase', 'analyzed_text': analyzed}
+        djtext = analyzed
         # Analyze the text
-        return render(request, 'analyze.html', params)
+        # return render(request, 'analyze.html', params)
 
-    elif(extraspaceremover=="on"):
+    if(extraspaceremover=="on"):
         analyzed = ""
         for index, char in enumerate(djtext):
             if not(djtext[index] == " " and djtext[index+1]==" "):
                 analyzed = analyzed + char
 
         params = {'purpose': 'Removed NewLines', 'analyzed_text': analyzed}
+        djtext = analyzed
         # Analyze the text
-        return render(request, 'analyze.html', params)
+        # return render(request, 'analyze.html', params)
 
-    elif (newlineremover == "on"):
+    if (newlineremover == "on"):
         analyzed = ""
         for char in djtext:
-            if char != "\n":
+            if char != "\n" and char!="\r":
                 analyzed = analyzed + char
-
+            else:
+                print("no")
+        print("pre", analyzed)
         params = {'purpose': 'Removed NewLines', 'analyzed_text': analyzed}
-        # Analyze the text
-        return render(request, 'analyze.html', params)
-    else:
-        return HttpResponse("Error")
 
-# def capfirst(request):
-#     return HttpResponse("capitalize first")
-#
-# def newlineremove(request):
-#     return HttpResponse("newline remove first")
-#
-#
-# def spaceremove(request):
-#     return HttpResponse("space remover back")
-#
-# def charcount(request):
-#     return HttpResponse("charcount ")
+    if(removepunc != "on" and newlineremover!="on" and extraspaceremover!="on" and fullcaps!="on"):
+        return HttpResponse("please select any operation and try again")
 
+    return render(request, 'analyze.html', params)
 
 
 
